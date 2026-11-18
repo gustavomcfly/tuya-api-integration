@@ -1,0 +1,24 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+*.tsbuildinfo
+
+# Segredos — nunca versionar
+.env
+.env.*
+!.env.example
+
+# Netlify
+.netlify
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
