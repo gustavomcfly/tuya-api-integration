@@ -69,6 +69,8 @@ export function translateNetworkError(error: unknown): string | null {
   const err = error as { name?: string; code?: string; cause?: { code?: string }; message?: string };
   const code = err?.cause?.code ?? err?.code;
   const msg = String(err?.message ?? "");
+  if (code && /CERT|SELF_SIGNED|UNABLE_TO_(GET|VERIFY)/.test(code))
+    return `Certificado HTTPS não confiável (${code}): a rede está inspecionando o tráfego. Rode o servidor com NODE_OPTIONS=--use-system-ca (já incluso nos scripts npm) ou configure NODE_EXTRA_CA_CERTS.`;
   if (err?.name === "TimeoutError" || err?.name === "AbortError" || /timeout/i.test(msg))
     return "Tempo esgotado ao comunicar com a Tuya.";
   if (code === "ENOTFOUND" || code === "EAI_AGAIN")
@@ -90,8 +92,9 @@ export class TuyaError extends Error {
   original: string;
   httpStatus?: number;
 
+  // code -1 = erro local (rede/TLS/resposta inválida): a mensagem já vem pronta em pt-BR.
   constructor(code: number, original: string, httpStatus?: number) {
-    super(translateTuyaCode(code, original));
+    super(code === -1 ? original : translateTuyaCode(code, original));
     this.name = "TuyaError";
     this.code = code;
     this.original = original;

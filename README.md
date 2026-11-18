@@ -17,7 +17,7 @@ Sistema de controle e automação para testes de fechaduras digitais **Tuya** (e
 ## 🚀 Tecnologias
 
 - **Frontend:** React 19 + TypeScript, Tailwind CSS 4, [Vite](https://vitejs.dev/)
-- **Backend:** Node.js 20.19+ + Express 5 em TypeScript (executado com `tsx`)
+- **Backend:** Node.js 22.15+ + Express 5 em TypeScript (executado com `tsx`)
 - **Banco:** PostgreSQL + [Prisma 7](https://www.prisma.io/) (`@prisma/adapter-pg`)
 - **Sessão:** JWT próprio (contas locais, senha com `scrypt`)
 - **Integração:** [Tuya Cloud Open API](https://developer.tuya.com/en/docs/cloud/) (assinatura HMAC-SHA256, tickets AES)
@@ -42,7 +42,7 @@ Os dispositivos aparecem quando a conta do app **Smart Life / Tuya Smart** é vi
 
 ### 1. Pré-requisitos
 
-- Node.js **20.19+** (recomendado 22 LTS), PostgreSQL 14+ (pgAdmin), Git
+- Node.js **22.15+** (recomendado 24; necessário para `--use-system-ca`), PostgreSQL 14+ (pgAdmin), Git
 - Um projeto em [platform.tuya.com](https://platform.tuya.com) → **Cloud → Development → Create Cloud Project**
   - Em **Service API**, autorize: *IoT Core*, *Authorization Token Management* e *Smart Lock Open Service*
   - Em **Devices → Link App Account**, vincule a conta do app Smart Life onde as fechaduras estão pareadas
@@ -150,7 +150,9 @@ Dispositivos que **não** são fechadura, mas têm DP `switch_1`/`switch`, podem
 | `2001 device is offline` | Fechadura sem Wi-Fi / gateway desconectado |
 | Abrir/trancar falha em fechadura | Habilite "abertura remota sem senha" em *Configurações Avançadas* ou no app |
 | Senha recusada (`1109`) | Wi-Fi exige 7 dígitos; Zigbee/BLE, 6 |
-| `self-signed certificate` no `prisma` | Rede corporativa com inspeção TLS: rode o Prisma numa rede sem proxy ou configure `NODE_EXTRA_CA_CERTS` |
+| `SELF_SIGNED_CERT_IN_CHAIN` / "Certificado HTTPS não confiável" | Rede corporativa inspecionando HTTPS. Os scripts npm já usam `--use-system-ca` (certificados do Windows); rodando `node`/`tsx` direto, defina `NODE_OPTIONS=--use-system-ca` |
+| `28841002` plano expirado | Renove o plano gratuito em *Cloud → Cloud Services → IoT Core* (Extend Trial Period) |
+| `self-signed certificate` no `prisma` | Mesma causa: baixe os binários do Prisma fora do proxy ou configure `NODE_EXTRA_CA_CERTS` |
 | `EADDRINUSE :::3002` | Libere a porta ou altere `PORT` (e `VITE_API_TARGET` no client) |
 
 ---
